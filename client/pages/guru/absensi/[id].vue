@@ -30,8 +30,8 @@
           :key="detail.id"
           class="flex items-center gap-3 p-3 rounded-lg border border-gray-100"
         >
-          <div class="w-7 h-7 bg-brand-100 rounded-full flex items-center justify-center flex-shrink-0">
-            <span class="text-brand-700 text-xs font-semibold">{{ detail.student?.full_name[0] }}</span>
+          <div class="w-7 h-7 flex-shrink-0">
+            <UserAvatar :photo="detail.student?.photo" :gender="detail.student?.gender" :name="detail.student?.full_name || ''" size="xs" />
           </div>
           <div class="flex-1">
             <p class="text-sm font-medium text-gray-900">{{ detail.student?.full_name }}</p>

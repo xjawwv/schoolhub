@@ -29,7 +29,7 @@
                 <td class="font-mono text-xs text-gray-500">{{ teacher.nip }}</td>
                 <td>
                   <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0"><span class="text-white text-xs font-bold">{{ teacher.full_name[0] }}</span></div>
+                    <UserAvatar :photo="teacher.photo" :gender="teacher.gender" :name="teacher.full_name" size="sm" class="rounded-lg" />
                     <span class="font-semibold text-gray-900">{{ teacher.full_name }}</span>
                   </div>
                 </td>

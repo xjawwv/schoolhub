@@ -86,11 +86,13 @@
       <div class="w-px h-6 bg-gray-200 mx-1" />
 
       <div class="flex items-center gap-2.5 pl-1">
-        <div class="w-9 h-9 bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl flex items-center justify-center shadow-sm">
-          <span class="text-white font-bold text-xs">
-            {{ userInitials }}
-          </span>
-        </div>
+        <UserAvatar
+          :photo="navbarPhoto"
+          :gender="navbarGender"
+          :name="authStore.user?.username || ''"
+          size="sm"
+          class="rounded-xl shadow-sm"
+        />
         <div class="hidden sm:block">
           <p class="text-sm font-semibold text-gray-900 leading-tight">{{ authStore.user?.username }}</p>
           <p class="text-[11px] text-gray-400 font-medium">{{ roleLabel }}</p>
@@ -107,14 +109,19 @@ const notificationsStore = useNotificationsStore()
 const route = useRoute()
 const notifOpen = ref(false)
 
-const userInitials = computed(() => {
-  const name = authStore.user?.username || ''
-  return name.slice(0, 2).toUpperCase()
-})
-
 const roleLabel = computed(() => {
   const labels = { ADMIN: 'Administrator', GURU: 'Guru', SISWA: 'Siswa' }
   return labels[authStore.user?.role] || ''
+})
+
+const navbarPhoto = computed(() => {
+  const profile = authStore.user?.profile
+  return profile?.photo || null
+})
+
+const navbarGender = computed(() => {
+  const profile = authStore.user?.profile
+  return profile?.gender || ''
 })
 
 const currentSection = computed(() => {

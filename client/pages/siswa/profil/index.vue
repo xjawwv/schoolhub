@@ -9,9 +9,7 @@
 
     <div v-else-if="profile" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="card flex flex-col items-center text-center">
-        <div class="w-24 h-24 bg-brand-100 rounded-full flex items-center justify-center mb-4">
-          <span class="text-brand-700 font-bold text-3xl">{{ profile.full_name[0] }}</span>
-        </div>
+        <UserAvatar :photo="profile.photo" :gender="profile.gender" :name="profile.full_name" size="xl" class="mb-4" />
         <h2 class="text-xl font-bold text-gray-900">{{ profile.full_name }}</h2>
         <p class="text-gray-500 text-sm mt-1">{{ profile.nis }}</p>
         <AppBadge variant="info" class="mt-2">{{ profile.class?.name || 'Belum ada kelas' }}</AppBadge>

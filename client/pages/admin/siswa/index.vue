@@ -53,9 +53,7 @@
                 <td class="font-mono text-xs text-gray-500">{{ student.nis }}</td>
                 <td>
                   <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 bg-gradient-to-br from-brand-500 to-brand-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span class="text-white text-xs font-bold">{{ student.full_name[0] }}</span>
-                    </div>
+                    <UserAvatar :photo="student.photo" :gender="student.gender" :name="student.full_name" size="sm" class="rounded-lg" />
                     <span class="font-semibold text-gray-900">{{ student.full_name }}</span>
                   </div>
                 </td>

@@ -32,9 +32,7 @@
                 <td class="font-mono text-xs">{{ student.nis }}</td>
                 <td>
                   <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 bg-brand-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span class="text-brand-700 text-xs font-semibold">{{ student.full_name[0] }}</span>
-                    </div>
+                    <UserAvatar :photo="student.photo" :gender="student.gender" :name="student.full_name" size="xs" />
                     <span class="font-medium text-gray-900">{{ student.full_name }}</span>
                   </div>
                 </td>
