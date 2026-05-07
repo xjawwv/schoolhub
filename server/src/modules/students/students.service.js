@@ -74,7 +74,7 @@ const create = async (data) => {
         birth_date: new Date(data.birth_date),
         birth_place: data.birth_place,
         address: data.address,
-        phone: data.phone || null,
+        phone: data.phone ? String(data.phone) : null,
         class_id: data.class_id ? parseInt(data.class_id) : null,
       },
       include: {
@@ -97,7 +97,10 @@ const update = async (id, data, photo) => {
   const allowedFields = ['full_name', 'gender', 'birth_date', 'birth_place', 'address', 'phone', 'class_id']
   allowedFields.forEach((field) => {
     if (data[field] !== undefined) {
-      updateData[field] = field === 'birth_date' ? new Date(data[field]) : field === 'class_id' ? parseInt(data[field]) : data[field]
+      if (field === 'birth_date') updateData[field] = new Date(data[field])
+      else if (field === 'class_id') updateData[field] = parseInt(data[field])
+      else if (field === 'phone') updateData[field] = data[field] ? String(data[field]) : null
+      else updateData[field] = data[field]
     }
   })
 

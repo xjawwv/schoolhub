@@ -157,7 +157,11 @@ const handleSubmit = () => {
   if (!validate()) return
   const data = { ...form }
   if (!data.class_id) delete data.class_id
-  if (!data.phone) delete data.phone
+  if (data.phone) {
+    data.phone = String(data.phone)
+  } else {
+    delete data.phone
+  }
   emit('submit', data)
 }
 </script>

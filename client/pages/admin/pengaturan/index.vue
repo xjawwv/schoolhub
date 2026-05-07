@@ -9,8 +9,8 @@
       <div class="xl:col-span-2 space-y-5">
         <div class="card">
           <div class="flex items-center gap-3 mb-5">
-            <div class="w-9 h-9 bg-brand-50 rounded-xl flex items-center justify-center">
-              <svg class="w-4.5 h-4.5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="w-9 h-9 bg-brand-50 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
               </svg>
@@ -36,7 +36,6 @@
                   class="input font-mono text-sm"
                   placeholder="-6.200000"
                   required
-                  @input="updateMarkerFromForm"
                 />
               </div>
               <div>
@@ -48,7 +47,6 @@
                   class="input font-mono text-sm"
                   placeholder="106.816666"
                   required
-                  @input="updateMarkerFromForm"
                 />
               </div>
             </div>
@@ -66,14 +64,13 @@
                   max="500"
                   step="10"
                   class="flex-1 accent-brand-600"
-                  @input="updateCircle"
                 />
-                <div class="w-20 text-center">
+                <div class="w-20 text-center flex-shrink-0">
                   <span class="text-lg font-bold text-brand-600">{{ form.school_radius }}</span>
                   <span class="text-xs text-gray-400 block">meter</span>
                 </div>
               </div>
-              <div class="flex justify-between text-xs text-gray-400 mt-1 px-0.5">
+              <div class="flex justify-between text-xs text-gray-400 mt-1">
                 <span>50m</span>
                 <span>500m</span>
               </div>
@@ -84,7 +81,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
               </svg>
               <p class="text-xs text-blue-700">
-                Klik pada peta untuk memilih lokasi sekolah, atau geser marker ke posisi yang tepat. Lingkaran biru menunjukkan area radius absensi.
+                Klik pada peta untuk memilih lokasi, atau geser marker. Lingkaran ungu menunjukkan area radius absensi.
               </p>
             </div>
 
@@ -108,8 +105,8 @@
 
         <div class="card">
           <div class="flex items-center gap-3 mb-4">
-            <div class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center">
-              <svg class="w-4.5 h-4.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
               </svg>
             </div>
@@ -118,11 +115,11 @@
           <div class="space-y-2">
             <div v-for="f in securityFeatures" :key="f.label" class="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
               <div class="w-2 h-2 bg-emerald-500 rounded-full flex-shrink-0" />
-              <div class="flex-1">
+              <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-gray-900">{{ f.label }}</p>
                 <p class="text-xs text-gray-400">{{ f.desc }}</p>
               </div>
-              <span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Aktif</span>
+              <span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full flex-shrink-0">Aktif</span>
             </div>
           </div>
         </div>
@@ -136,11 +133,30 @@
               <p class="text-xs text-gray-500 mt-0.5">Klik peta atau geser marker untuk memilih lokasi</p>
             </div>
             <div v-if="form.school_latitude && form.school_longitude" class="text-right">
-              <p class="text-xs font-mono text-gray-600">{{ Number(form.school_latitude).toFixed(6) }}</p>
-              <p class="text-xs font-mono text-gray-600">{{ Number(form.school_longitude).toFixed(6) }}</p>
+              <p class="text-xs font-mono text-gray-500">{{ Number(form.school_latitude).toFixed(6) }}</p>
+              <p class="text-xs font-mono text-gray-500">{{ Number(form.school_longitude).toFixed(6) }}</p>
             </div>
           </div>
-          <div ref="mapContainer" class="w-full" style="height: 520px;" />
+
+          <ClientOnly>
+            <LeafletMap
+              :latitude="form.school_latitude || -6.2"
+              :longitude="form.school_longitude || 106.816"
+              :radius="form.school_radius"
+              :school-name="form.school_name"
+              :height="500"
+              @update:latitude="form.school_latitude = $event"
+              @update:longitude="form.school_longitude = $event"
+            />
+            <template #fallback>
+              <div class="flex items-center justify-center bg-gray-50" style="height:500px">
+                <div class="flex flex-col items-center gap-3">
+                  <div class="w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
+                  <p class="text-sm text-gray-500">Memuat peta...</p>
+                </div>
+              </div>
+            </template>
+          </ClientOnly>
         </div>
       </div>
     </div>
@@ -154,7 +170,6 @@ import { settingsService } from '~/services/settings.service'
 
 const toast = useToast()
 
-const mapContainer = ref(null)
 const loadingSettings = ref(true)
 const saving = ref(false)
 
@@ -165,10 +180,6 @@ const form = reactive({
   school_radius: 100,
 })
 
-let map = null
-let marker = null
-let circle = null
-
 const securityFeatures = [
   { label: 'Validasi Radius GPS', desc: 'Absensi hanya dalam radius yang ditentukan' },
   { label: 'Deteksi GPS Palsu', desc: 'Cek akurasi, timestamp, dan kecepatan anomali' },
@@ -176,98 +187,15 @@ const securityFeatures = [
   { label: 'Satu Absensi Per Hari', desc: 'Constraint unik di level database' },
 ]
 
-const initMap = async () => {
-  if (!process.client || !mapContainer.value) return
-
-  const L = await useLeaflet()
-  if (!L) return
-
-  const defaultLat = form.school_latitude ? parseFloat(form.school_latitude) : -6.2
-  const defaultLon = form.school_longitude ? parseFloat(form.school_longitude) : 106.816
-
-  if (map) {
-    map.remove()
-    map = null
-  }
-
-  map = L.map(mapContainer.value, { zoomControl: true }).setView([defaultLat, defaultLon], 17)
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 19,
-  }).addTo(map)
-
-  if (form.school_latitude && form.school_longitude) {
-    placeMarker(L, defaultLat, defaultLon)
-  }
-
-  map.on('click', (e) => {
-    const { lat, lng } = e.latlng
-    form.school_latitude = lat.toFixed(7)
-    form.school_longitude = lng.toFixed(7)
-    placeMarker(L, lat, lng)
-  })
-}
-
-const placeMarker = async (L, lat, lng) => {
-  const leaflet = L || await useLeaflet()
-  if (!leaflet) return
-
-  if (marker) { marker.remove(); marker = null }
-  if (circle) { circle.remove(); circle = null }
-
-  marker = leaflet.marker([lat, lng], { draggable: true }).addTo(map)
-  marker.bindPopup(`<b>${form.school_name || 'Sekolah'}</b><br>${lat.toFixed(6)}, ${lng.toFixed(6)}`).openPopup()
-
-  marker.on('dragend', (e) => {
-    const pos = e.target.getLatLng()
-    form.school_latitude = pos.lat.toFixed(7)
-    form.school_longitude = pos.lng.toFixed(7)
-    updateCircle()
-    marker.setPopupContent(`<b>${form.school_name || 'Sekolah'}</b><br>${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`)
-  })
-
-  circle = leaflet.circle([lat, lng], {
-    radius: parseInt(form.school_radius) || 100,
-    color: '#4f46e5',
-    fillColor: '#4f46e5',
-    fillOpacity: 0.08,
-    weight: 2,
-  }).addTo(map)
-}
-
-const updateCircle = () => {
-  if (!circle) return
-  circle.setRadius(parseInt(form.school_radius) || 100)
-}
-
-const updateMarkerFromForm = async () => {
-  const lat = parseFloat(form.school_latitude)
-  const lng = parseFloat(form.school_longitude)
-  if (isNaN(lat) || isNaN(lng) || !map) return
-  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return
-
-  const L = await useLeaflet()
-  if (!L) return
-  placeMarker(L, lat, lng)
-  map.setView([lat, lng], map.getZoom())
-}
-
 const useMyLocation = () => {
   if (!navigator.geolocation) {
     toast.error('Browser tidak mendukung GPS')
     return
   }
   navigator.geolocation.getCurrentPosition(
-    async (pos) => {
-      const lat = pos.coords.latitude
-      const lng = pos.coords.longitude
-      form.school_latitude = lat.toFixed(7)
-      form.school_longitude = lng.toFixed(7)
-      const L = await useLeaflet()
-      if (!L) return
-      placeMarker(L, lat, lng)
-      map.setView([lat, lng], 17)
+    (pos) => {
+      form.school_latitude = pos.coords.latitude.toFixed(7)
+      form.school_longitude = pos.coords.longitude.toFixed(7)
       toast.success('Lokasi berhasil dideteksi')
     },
     () => toast.error('Gagal mendapatkan lokasi')
@@ -275,6 +203,10 @@ const useMyLocation = () => {
 }
 
 const handleSave = async () => {
+  if (!form.school_latitude || !form.school_longitude) {
+    toast.error('Pilih lokasi sekolah pada peta terlebih dahulu')
+    return
+  }
   saving.value = true
   try {
     await settingsService.update({
@@ -301,19 +233,8 @@ onMounted(async () => {
       form.school_radius = response.data.school_radius || 100
     }
   } catch {
-    // settings belum ada, form tetap kosong
   } finally {
     loadingSettings.value = false
-  }
-
-  await nextTick()
-  await initMap()
-})
-
-onUnmounted(() => {
-  if (map) {
-    map.remove()
-    map = null
   }
 })
 </script>

@@ -74,7 +74,7 @@ const create = async (data) => {
         birth_date: new Date(data.birth_date),
         birth_place: data.birth_place,
         address: data.address,
-        phone: data.phone || null,
+        phone: data.phone ? String(data.phone) : null,
       },
       include: {
         user: { select: { id: true, username: true, email: true } },
@@ -95,7 +95,9 @@ const update = async (id, data, photo) => {
   const allowedFields = ['full_name', 'gender', 'birth_date', 'birth_place', 'address', 'phone']
   allowedFields.forEach((field) => {
     if (data[field] !== undefined) {
-      updateData[field] = field === 'birth_date' ? new Date(data[field]) : data[field]
+      if (field === 'birth_date') updateData[field] = new Date(data[field])
+      else if (field === 'phone') updateData[field] = data[field] ? String(data[field]) : null
+      else updateData[field] = data[field]
     }
   })
 

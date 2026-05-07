@@ -208,14 +208,53 @@ async function main() {
     },
   })
 
+  await prisma.schedules.deleteMany({})
+
+  const jadwalKelas10 = [
+    { day: 'Senin',  start_time: '07:30', end_time: '09:00',  subject_id: mapel1.id, teacher_id: guru1.id },
+    { day: 'Senin',  start_time: '09:00', end_time: '10:30',  subject_id: mapel2.id, teacher_id: guru1.id },
+    { day: 'Senin',  start_time: '10:45', end_time: '12:15',  subject_id: mapel3.id, teacher_id: guru2.id },
+    { day: 'Selasa', start_time: '07:30', end_time: '09:00',  subject_id: mapel3.id, teacher_id: guru2.id },
+    { day: 'Selasa', start_time: '09:00', end_time: '10:30',  subject_id: mapel1.id, teacher_id: guru1.id },
+    { day: 'Selasa', start_time: '10:45', end_time: '12:15',  subject_id: mapel2.id, teacher_id: guru1.id },
+    { day: 'Selasa', start_time: '13:00', end_time: '15:00',  subject_id: mapel1.id, teacher_id: guru1.id },
+    { day: 'Rabu',   start_time: '07:30', end_time: '09:00',  subject_id: mapel2.id, teacher_id: guru1.id },
+    { day: 'Rabu',   start_time: '09:00', end_time: '10:30',  subject_id: mapel3.id, teacher_id: guru2.id },
+    { day: 'Rabu',   start_time: '13:00', end_time: '15:00',  subject_id: mapel1.id, teacher_id: guru1.id },
+    { day: 'Kamis',  start_time: '07:30', end_time: '09:45',  subject_id: mapel1.id, teacher_id: guru1.id },
+    { day: 'Kamis',  start_time: '09:45', end_time: '12:15',  subject_id: mapel3.id, teacher_id: guru2.id },
+    { day: 'Kamis',  start_time: '13:00', end_time: '15:00',  subject_id: mapel2.id, teacher_id: guru1.id },
+    { day: 'Jumat',  start_time: '07:30', end_time: '09:45',  subject_id: mapel3.id, teacher_id: guru2.id },
+    { day: 'Jumat',  start_time: '09:45', end_time: '12:15',  subject_id: mapel2.id, teacher_id: guru1.id },
+    { day: 'Jumat',  start_time: '13:00', end_time: '15:00',  subject_id: mapel1.id, teacher_id: guru1.id },
+  ]
+
+  const jadwalKelas11 = [
+    { day: 'Senin',  start_time: '07:30', end_time: '09:45',  subject_id: mapel3.id, teacher_id: guru2.id },
+    { day: 'Senin',  start_time: '09:45', end_time: '12:15',  subject_id: mapel1.id, teacher_id: guru1.id },
+    { day: 'Senin',  start_time: '13:00', end_time: '15:00',  subject_id: mapel2.id, teacher_id: guru1.id },
+    { day: 'Selasa', start_time: '07:30', end_time: '09:00',  subject_id: mapel1.id, teacher_id: guru1.id },
+    { day: 'Selasa', start_time: '09:00', end_time: '10:30',  subject_id: mapel2.id, teacher_id: guru1.id },
+    { day: 'Selasa', start_time: '10:45', end_time: '12:15',  subject_id: mapel3.id, teacher_id: guru2.id },
+    { day: 'Selasa', start_time: '13:00', end_time: '15:00',  subject_id: mapel1.id, teacher_id: guru1.id },
+    { day: 'Rabu',   start_time: '07:30', end_time: '09:00',  subject_id: mapel2.id, teacher_id: guru1.id },
+    { day: 'Rabu',   start_time: '09:00', end_time: '10:30',  subject_id: mapel3.id, teacher_id: guru2.id },
+    { day: 'Rabu',   start_time: '10:45', end_time: '12:15',  subject_id: mapel1.id, teacher_id: guru1.id },
+    { day: 'Rabu',   start_time: '13:00', end_time: '15:00',  subject_id: mapel2.id, teacher_id: guru1.id },
+    { day: 'Kamis',  start_time: '07:30', end_time: '09:00',  subject_id: mapel3.id, teacher_id: guru2.id },
+    { day: 'Kamis',  start_time: '09:00', end_time: '12:15',  subject_id: mapel1.id, teacher_id: guru1.id },
+    { day: 'Kamis',  start_time: '13:00', end_time: '15:00',  subject_id: mapel2.id, teacher_id: guru1.id },
+    { day: 'Jumat',  start_time: '07:30', end_time: '09:00',  subject_id: mapel2.id, teacher_id: guru1.id },
+    { day: 'Jumat',  start_time: '09:00', end_time: '10:30',  subject_id: mapel3.id, teacher_id: guru2.id },
+    { day: 'Jumat',  start_time: '10:45', end_time: '12:15',  subject_id: mapel1.id, teacher_id: guru1.id },
+    { day: 'Jumat',  start_time: '13:00', end_time: '15:00',  subject_id: mapel3.id, teacher_id: guru2.id },
+  ]
+
   await prisma.schedules.createMany({
     skipDuplicates: true,
     data: [
-      { class_id: kelas10PPLG.id, subject_id: mapel1.id, teacher_id: guru1.id, day: 'Senin', start_time: '07:00', end_time: '08:30', room: 'Lab Komputer 1' },
-      { class_id: kelas10PPLG.id, subject_id: mapel2.id, teacher_id: guru1.id, day: 'Selasa', start_time: '07:00', end_time: '08:30', room: 'Lab Komputer 1' },
-      { class_id: kelas10PPLG.id, subject_id: mapel3.id, teacher_id: guru2.id, day: 'Rabu', start_time: '07:00', end_time: '08:30', room: 'Ruang 101' },
-      { class_id: kelas11PPLG.id, subject_id: mapel1.id, teacher_id: guru1.id, day: 'Kamis', start_time: '07:00', end_time: '08:30', room: 'Lab Komputer 2' },
-      { class_id: kelas11PPLG.id, subject_id: mapel3.id, teacher_id: guru2.id, day: 'Jumat', start_time: '07:00', end_time: '08:30', room: 'Ruang 102' },
+      ...jadwalKelas10.map((j) => ({ ...j, class_id: kelas10PPLG.id })),
+      ...jadwalKelas11.map((j) => ({ ...j, class_id: kelas11PPLG.id })),
     ],
   })
 

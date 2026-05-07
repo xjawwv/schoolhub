@@ -39,9 +39,9 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Hari</th>
-                <th>Waktu</th>
                 <th>Kelas</th>
+                <th>Hari</th>
+                <th>Jam</th>
                 <th>Mata Pelajaran</th>
                 <th>Guru</th>
                 <th>Aksi</th>
@@ -49,14 +49,12 @@
             </thead>
             <tbody>
               <tr v-for="schedule in schedules" :key="schedule.id">
-                <td><AppBadge variant="brand">{{ schedule.day }}</AppBadge></td>
-                <td class="font-mono text-xs text-gray-600">{{ schedule.start_time }} – {{ schedule.end_time }}</td>
                 <td class="font-semibold text-gray-900">{{ schedule.class?.name }}</td>
+                <td><AppBadge variant="brand">{{ schedule.day }}</AppBadge></td>
+                <td class="font-mono text-xs text-gray-600 whitespace-nowrap">{{ schedule.start_time }} – {{ schedule.end_time }}</td>
                 <td>
-                  <div>
-                    <p class="font-medium text-gray-900">{{ schedule.subject?.name }}</p>
-                    <p class="text-xs text-gray-400 font-mono">{{ schedule.subject?.code }}</p>
-                  </div>
+                  <p class="font-medium text-gray-900">{{ schedule.subject?.name }}</p>
+                  <p class="text-xs text-gray-400 font-mono">{{ schedule.subject?.code }}</p>
                 </td>
                 <td class="text-gray-600">{{ schedule.teacher?.full_name }}</td>
                 <td>

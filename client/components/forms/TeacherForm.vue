@@ -136,7 +136,11 @@ const blockNonNumeric = (e) => {
 const handleSubmit = () => {
   if (!validate()) return
   const data = { ...form }
-  if (!data.phone) delete data.phone
+  if (data.phone) {
+    data.phone = String(data.phone)
+  } else {
+    delete data.phone
+  }
   emit('submit', data)
 }
 </script>
