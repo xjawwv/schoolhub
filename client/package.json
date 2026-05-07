@@ -13,6 +13,7 @@
     "@vueuse/core": "^11.3.0",
     "@vueuse/nuxt": "^11.3.0",
     "axios": "^1.7.7",
+    "leaflet": "^1.9.4",
     "nuxt": "^3.14.0",
     "pinia": "^2.2.6",
     "socket.io-client": "^4.8.1",

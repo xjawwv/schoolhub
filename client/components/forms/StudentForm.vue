@@ -60,7 +60,14 @@
 
       <div>
         <label class="label">No. Telepon</label>
-        <input v-model="form.phone" type="tel" class="input" placeholder="08xxxxxxxxxx" />
+        <input
+          v-model="form.phone"
+          type="number"
+          class="input"
+          placeholder="08xxxxxxxxxx"
+          min="0"
+          @keydown="blockNonNumeric"
+        />
       </div>
 
       <div class="sm:col-span-2">
@@ -137,6 +144,13 @@ const validate = () => {
   if (!form.full_name.trim()) { errors.full_name = 'Nama lengkap wajib diisi'; valid = false }
 
   return valid
+}
+
+const blockNonNumeric = (e) => {
+  const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter']
+  if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+    e.preventDefault()
+  }
 }
 
 const handleSubmit = () => {

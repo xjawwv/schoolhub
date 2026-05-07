@@ -1,5 +1,6 @@
 const prisma = require('../../config/database')
 const { getPagination, buildMeta } = require('../../utils/pagination')
+const { validateLocation, detectSuspiciousLocation } = require('../../utils/geolocation')
 
 const getAll = async (query) => {
   const { page, limit, skip } = getPagination(query)
@@ -53,6 +54,36 @@ const checkIn = async (userId, data) => {
   if (!student) throw { statusCode: 404, message: 'Data siswa tidak ditemukan' }
   if (!student.class_id) throw { statusCode: 400, message: 'Siswa belum terdaftar di kelas manapun' }
 
+  const { latitude, longitude, accuracy } = data
+
+  if (latitude === undefined || latitude === null || longitude === undefined || longitude === null) {
+    throw { statusCode: 400, message: 'Data lokasi wajib disertakan untuk absensi' }
+  }
+
+  const lat = parseFloat(latitude)
+  const lon = parseFloat(longitude)
+  const acc = accuracy !== undefined ? parseFloat(accuracy) : null
+
+  const schoolSettings = await prisma.school_settings.findFirst()
+  if (!schoolSettings) {
+    throw { statusCode: 503, message: 'Konfigurasi lokasi sekolah belum diatur. Hubungi administrator' }
+  }
+
+  const locationResult = validateLocation(lat, lon, acc, {
+    lat: schoolSettings.school_latitude,
+    lon: schoolSettings.school_longitude,
+    radius: schoolSettings.school_radius,
+  })
+
+  if (!locationResult.valid) {
+    throw { statusCode: 403, message: locationResult.reason }
+  }
+
+  const suspiciousFlags = detectSuspiciousLocation(lat, lon, acc)
+  if (suspiciousFlags.includes('accuracy_zero') || suspiciousFlags.includes('accuracy_too_perfect')) {
+    throw { statusCode: 403, message: 'Terdeteksi penggunaan GPS palsu. Absensi ditolak' }
+  }
+
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
@@ -84,6 +115,10 @@ const checkIn = async (userId, data) => {
       status: data.status || 'HADIR',
       notes: data.notes || null,
       check_in_time: new Date(),
+      latitude: lat,
+      longitude: lon,
+      accuracy: acc,
+      is_location_valid: true,
     },
     include: {
       attendance: {

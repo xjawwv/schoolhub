@@ -139,6 +139,10 @@ model attendance_details {
   status        AttendanceStatus @default(HADIR)
   notes         String?          @db.Text
   check_in_time DateTime?
+  latitude      Float?
+  longitude     Float?
+  accuracy      Float?
+  is_location_valid Boolean     @default(false)
   created_at    DateTime         @default(now())
   updated_at    DateTime         @updatedAt
 
@@ -184,4 +188,15 @@ model notifications {
   created_at DateTime @default(now())
 
   user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model school_settings {
+  id                Int      @id @default(autoincrement())
+  school_name       String   @db.VarChar(200)
+  school_latitude   Float
+  school_longitude  Float
+  school_radius     Int      @default(100)
+  updated_by        Int?
+  updated_at        DateTime @updatedAt
+  created_at        DateTime @default(now())
 }

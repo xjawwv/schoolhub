@@ -23,20 +23,71 @@
                 {{ todayStatus.detail?.status }}
               </AppBadge>
               <p class="text-sm font-semibold text-gray-900">Sudah absen hari ini</p>
-              <p class="text-xs text-gray-400 mt-1">
-                {{ formatTime(todayStatus.detail?.check_in_time) }}
-              </p>
+              <p class="text-xs text-gray-400 mt-1">{{ formatTime(todayStatus.detail?.check_in_time) }}</p>
+              <div v-if="todayStatus.detail?.is_location_valid" class="flex items-center gap-1.5 mt-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                </svg>
+                Lokasi terverifikasi
+              </div>
               <p v-if="todayStatus.detail?.notes" class="text-xs text-gray-500 mt-2 bg-gray-50 rounded-lg px-3 py-2 w-full text-left">
                 {{ todayStatus.detail.notes }}
               </p>
             </div>
 
             <div v-else class="space-y-4">
-              <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
-                <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-start gap-3">
+                <svg class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
                 </svg>
                 <p class="text-sm text-amber-700 font-medium">Anda belum absen hari ini</p>
+              </div>
+
+              <div
+                class="rounded-xl p-3.5 border text-sm"
+                :class="locationStatusClass"
+              >
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" :class="locationIconBg">
+                    <svg v-if="locationState === 'idle'" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                    </svg>
+                    <svg v-else-if="locationState === 'loading'" class="w-4 h-4 text-brand-500 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    <svg v-else-if="locationState === 'valid'" class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <svg v-else class="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-sm" :class="locationTextColor">{{ locationStatusText }}</p>
+                    <p v-if="locationDetail" class="text-xs mt-0.5 text-gray-500">{{ locationDetail }}</p>
+                  </div>
+                  <button
+                    v-if="locationState !== 'loading'"
+                    class="text-xs font-medium text-brand-600 hover:text-brand-800 flex-shrink-0"
+                    @click="requestLocation"
+                  >
+                    {{ locationState === 'idle' ? 'Izinkan' : 'Coba lagi' }}
+                  </button>
+                </div>
+
+                <div v-if="locationState === 'valid' && currentPosition" class="mt-3 pt-3 border-t border-emerald-100 grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <p class="text-gray-400">Jarak ke sekolah</p>
+                    <p class="font-semibold text-gray-700">{{ distanceToSchool }} meter</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-400">Akurasi GPS</p>
+                    <p class="font-semibold text-gray-700">±{{ Math.round(currentPosition.accuracy) }} meter</p>
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -70,15 +121,22 @@
 
               <button
                 class="btn-primary w-full py-3"
-                :disabled="submitting"
+                :disabled="submitting || locationState !== 'valid'"
                 @click="handleCheckIn"
               >
                 <span v-if="submitting" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
                 </svg>
-                Catat Absensi
+                {{ locationState !== 'valid' ? 'Izinkan Lokasi Terlebih Dahulu' : 'Catat Absensi' }}
               </button>
+
+              <p class="text-xs text-gray-400 text-center flex items-center justify-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+                Absensi hanya bisa dilakukan di lingkungan sekolah
+              </p>
             </div>
           </template>
         </div>
@@ -86,14 +144,8 @@
 
       <div class="lg:col-span-2">
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-          <div
-            v-for="item in summaryItems"
-            :key="item.status"
-            class="card text-center p-4"
-          >
-            <p class="text-2xl font-black text-gray-900">
-              {{ summary[item.status] ?? 0 }}
-            </p>
+          <div v-for="item in summaryItems" :key="item.status" class="card text-center p-4">
+            <p class="text-2xl font-black text-gray-900">{{ summary[item.status] ?? 0 }}</p>
             <p class="text-xs text-gray-500 mt-1 font-medium">{{ item.label }}</p>
           </div>
         </div>
@@ -120,11 +172,18 @@
                 </div>
                 <div class="flex flex-col items-end gap-1">
                   <AppBadge :variant="statusVariant(detail.status)">{{ detail.status }}</AppBadge>
+                  <div v-if="detail.is_location_valid" class="flex items-center gap-1 text-[10px] text-emerald-600">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                    </svg>
+                    Terverifikasi
+                  </div>
                   <p v-if="detail.notes" class="text-xs text-gray-400 max-w-[120px] truncate">{{ detail.notes }}</p>
                 </div>
               </div>
             </div>
-            <AppEmpty v-else icon="attendance" title="Belum ada riwayat absensi" description="Riwayat absensi Anda akan muncul di sini" />
+            <AppEmpty v-else title="Belum ada riwayat absensi" description="Riwayat absensi Anda akan muncul di sini" />
             <AppPagination :meta="meta" @page-change="setPage" />
           </template>
         </div>
@@ -137,8 +196,10 @@
 definePageMeta({ layout: 'dashboard', middleware: 'siswa' })
 
 import { attendanceService } from '~/services/attendance.service'
+import { settingsService } from '~/services/settings.service'
 
 const toast = useToast()
+const { getCurrentPosition, checkInRadius } = useGeolocation()
 
 const todayStatus = ref({ hasCheckedIn: false, detail: null })
 const details = ref([])
@@ -148,6 +209,12 @@ const loading = ref(true)
 const loadingToday = ref(true)
 const submitting = ref(false)
 const currentPage = ref(1)
+
+const currentPosition = ref(null)
+const locationState = ref('idle')
+const locationError = ref('')
+const distanceToSchool = ref(null)
+const schoolConfig = ref(null)
 
 const checkInForm = reactive({ status: 'HADIR', notes: '' })
 
@@ -159,11 +226,50 @@ const statusOptions = [
 ]
 
 const summaryItems = [
-  { status: 'HADIR', label: 'Hadir', color: 'text-emerald-600' },
-  { status: 'SAKIT', label: 'Sakit', color: 'text-amber-600' },
-  { status: 'IZIN', label: 'Izin', color: 'text-blue-600' },
-  { status: 'ALPHA', label: 'Alpha', color: 'text-red-600' },
+  { status: 'HADIR', label: 'Hadir' },
+  { status: 'SAKIT', label: 'Sakit' },
+  { status: 'IZIN', label: 'Izin' },
+  { status: 'ALPHA', label: 'Alpha' },
 ]
+
+const locationStatusClass = computed(() => ({
+  'bg-gray-50 border-gray-200': locationState.value === 'idle',
+  'bg-brand-50 border-brand-200': locationState.value === 'loading',
+  'bg-emerald-50 border-emerald-200': locationState.value === 'valid',
+  'bg-red-50 border-red-200': locationState.value === 'error',
+}))
+
+const locationIconBg = computed(() => ({
+  'bg-gray-100': locationState.value === 'idle',
+  'bg-brand-100': locationState.value === 'loading',
+  'bg-emerald-100': locationState.value === 'valid',
+  'bg-red-100': locationState.value === 'error',
+}))
+
+const locationTextColor = computed(() => ({
+  'text-gray-600': locationState.value === 'idle',
+  'text-brand-600': locationState.value === 'loading',
+  'text-emerald-700': locationState.value === 'valid',
+  'text-red-700': locationState.value === 'error',
+}))
+
+const locationStatusText = computed(() => {
+  const map = {
+    idle: 'Izin lokasi diperlukan',
+    loading: 'Mendeteksi lokasi...',
+    valid: 'Lokasi terverifikasi',
+    error: locationError.value || 'Lokasi tidak valid',
+  }
+  return map[locationState.value]
+})
+
+const locationDetail = computed(() => {
+  if (locationState.value === 'idle') return 'Klik "Izinkan" untuk mengaktifkan GPS'
+  if (locationState.value === 'valid' && distanceToSchool.value !== null) {
+    return `${distanceToSchool.value} meter dari sekolah`
+  }
+  return null
+})
 
 const checkedInBg = computed(() => {
   const map = { HADIR: 'bg-emerald-50', SAKIT: 'bg-amber-50', IZIN: 'bg-blue-50', ALPHA: 'bg-red-50' }
@@ -210,6 +316,38 @@ const formatTime = (datetime) => {
   return new Date(datetime).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
 }
 
+const requestLocation = async () => {
+  locationState.value = 'loading'
+  locationError.value = ''
+
+  try {
+    const pos = await getCurrentPosition()
+    currentPosition.value = pos
+
+    if (schoolConfig.value) {
+      const result = checkInRadius(
+        pos.latitude,
+        pos.longitude,
+        schoolConfig.value.latitude,
+        schoolConfig.value.longitude,
+        schoolConfig.value.radius
+      )
+      distanceToSchool.value = result.distance
+
+      if (!result.inRadius) {
+        locationState.value = 'error'
+        locationError.value = `Anda berada ${result.distance}m dari sekolah (maks. ${schoolConfig.value.radius}m)`
+        return
+      }
+    }
+
+    locationState.value = 'valid'
+  } catch (err) {
+    locationState.value = 'error'
+    locationError.value = err.message
+  }
+}
+
 const fetchToday = async () => {
   loadingToday.value = true
   try {
@@ -242,17 +380,43 @@ const fetchSummary = async () => {
   } catch {}
 }
 
+const fetchSchoolConfig = async () => {
+  try {
+    const response = await settingsService.get()
+    if (response.data) {
+      schoolConfig.value = {
+        latitude: response.data.school_latitude,
+        longitude: response.data.school_longitude,
+        radius: response.data.school_radius,
+      }
+    }
+  } catch {}
+}
+
 const handleCheckIn = async () => {
+  if (locationState.value !== 'valid' || !currentPosition.value) {
+    toast.error('Izinkan akses lokasi terlebih dahulu')
+    return
+  }
+
   submitting.value = true
   try {
     await attendanceService.checkIn({
       status: checkInForm.status,
       notes: checkInForm.notes || null,
+      latitude: currentPosition.value.latitude,
+      longitude: currentPosition.value.longitude,
+      accuracy: currentPosition.value.accuracy,
     })
     toast.success('Absensi berhasil dicatat')
     await Promise.all([fetchToday(), fetchHistory(), fetchSummary()])
   } catch (error) {
-    toast.error(error.response?.data?.message || 'Gagal mencatat absensi')
+    const msg = error.response?.data?.message || 'Gagal mencatat absensi'
+    toast.error(msg)
+    if (msg.includes('GPS palsu') || msg.includes('lokasi')) {
+      locationState.value = 'error'
+      locationError.value = msg
+    }
   } finally {
     submitting.value = false
   }
@@ -264,5 +428,6 @@ onMounted(() => {
   fetchToday()
   fetchHistory()
   fetchSummary()
+  fetchSchoolConfig()
 })
 </script>

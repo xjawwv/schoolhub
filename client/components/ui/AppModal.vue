@@ -7,10 +7,10 @@
         @click.self="$emit('update:modelValue', false)"
       >
         <div
-          class="modal-panel bg-white rounded-2xl shadow-apple-lg w-full overflow-hidden"
+          class="modal-panel bg-white rounded-2xl shadow-apple-lg w-full"
           :class="sizeClass"
         >
-          <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50 rounded-t-2xl">
             <h3 class="text-lg font-bold text-gray-900">{{ title }}</h3>
             <button
               class="btn-icon !w-8 !h-8"
@@ -24,7 +24,7 @@
           <div class="px-6 py-5 max-h-[70vh] overflow-y-auto scrollbar-thin">
             <slot />
           </div>
-          <div v-if="$slots.footer" class="px-6 py-4 border-t border-gray-100 bg-gray-50/30 flex gap-3 justify-end">
+          <div v-if="$slots.footer" class="px-6 py-4 border-t border-gray-100 bg-gray-50/30 rounded-b-2xl flex gap-3 justify-end">
             <slot name="footer" />
           </div>
         </div>

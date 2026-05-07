@@ -14,6 +14,7 @@ const gradesRoutes = require('./modules/grades/grades.routes')
 const announcementsRoutes = require('./modules/announcements/announcements.routes')
 const notificationsRoutes = require('./modules/notifications/notifications.routes')
 const dashboardRoutes = require('./modules/dashboard/dashboard.routes')
+const settingsRoutes = require('./modules/settings/settings.routes')
 
 const { errorHandler, notFound } = require('./middleware/error.middleware')
 
@@ -47,6 +48,7 @@ app.use('/api/grades', gradesRoutes)
 app.use('/api/announcements', announcementsRoutes)
 app.use('/api/notifications', notificationsRoutes)
 app.use('/api/dashboard', dashboardRoutes)
+app.use('/api/settings', settingsRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
