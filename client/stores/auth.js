@@ -2,12 +2,28 @@ import { defineStore } from 'pinia'
 import { authService } from '~/services/auth.service'
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    user: null,
-    token: null,
-    loading: false,
-    error: null,
-  }),
+  state: () => {
+    const tokenCookie = useCookie('schoolhub_token', { maxAge: 60 * 60 * 24 * 7 })
+    const userCookie = useCookie('schoolhub_user', { maxAge: 60 * 60 * 24 * 7 })
+
+    let user = null
+    if (userCookie.value) {
+      try {
+        user = typeof userCookie.value === 'string'
+          ? JSON.parse(userCookie.value)
+          : userCookie.value
+      } catch {
+        user = null
+      }
+    }
+
+    return {
+      user,
+      token: tokenCookie.value || null,
+      loading: false,
+      error: null,
+    }
+  },
 
   getters: {
     isAuthenticated: (state) => !!state.token && !!state.user,
@@ -30,10 +46,7 @@ export const useAuthStore = defineStore('auth', {
         const response = await authService.login({ username, password })
         this.token = response.data.token
         this.user = response.data.user
-        if (process.client) {
-          localStorage.setItem('schoolhub_token', this.token)
-          localStorage.setItem('schoolhub_user', JSON.stringify(this.user))
-        }
+        this._persist()
         return response.data
       } catch (error) {
         this.error = error.response?.data?.message || 'Login gagal'
@@ -47,10 +60,8 @@ export const useAuthStore = defineStore('auth', {
       try {
         const response = await authService.getProfile()
         this.user = response.data
-        if (process.client) {
-          localStorage.setItem('schoolhub_user', JSON.stringify(this.user))
-        }
-      } catch (error) {
+        this._persist()
+      } catch {
         this.logout()
       }
     },
@@ -63,21 +74,19 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       this.user = null
       this.token = null
-      if (process.client) {
-        localStorage.removeItem('schoolhub_token')
-        localStorage.removeItem('schoolhub_user')
-      }
+      const tokenCookie = useCookie('schoolhub_token')
+      const userCookie = useCookie('schoolhub_user')
+      tokenCookie.value = null
+      userCookie.value = null
     },
 
-    initFromStorage() {
-      if (process.client) {
-        const token = localStorage.getItem('schoolhub_token')
-        const user = localStorage.getItem('schoolhub_user')
-        if (token && user) {
-          this.token = token
-          this.user = JSON.parse(user)
-        }
-      }
+    _persist() {
+      const tokenCookie = useCookie('schoolhub_token', { maxAge: 60 * 60 * 24 * 7 })
+      const userCookie = useCookie('schoolhub_user', { maxAge: 60 * 60 * 24 * 7 })
+      tokenCookie.value = this.token
+      userCookie.value = JSON.stringify(this.user)
     },
+
+    initFromStorage() {},
   },
 })

@@ -73,14 +73,27 @@
 
         <div class="card">
           <h3 class="font-bold text-gray-900 mb-5">Absensi Hari Ini</h3>
-          <div class="flex items-center justify-center py-8">
-            <div class="text-center">
-              <div class="w-24 h-24 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <p class="text-4xl font-black text-brand-600">{{ stats.todayAttendance }}</p>
+          <template v-if="stats.todayAttendance > 0">
+            <div class="flex items-center justify-center py-8">
+              <div class="text-center">
+                <div class="w-24 h-24 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <p class="text-4xl font-black text-brand-600">{{ stats.todayAttendance }}</p>
+                </div>
+                <p class="text-sm text-gray-500 font-medium">Kelas yang sudah absen</p>
               </div>
-              <p class="text-sm text-gray-500 font-medium">Kelas yang sudah absen</p>
             </div>
-          </div>
+          </template>
+          <template v-else>
+            <div class="flex flex-col items-center justify-center py-10 text-center">
+              <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+              </div>
+              <p class="text-sm font-semibold text-gray-700">Belum ada absensi hari ini</p>
+              <p class="text-xs text-gray-400 mt-1">Guru belum melakukan input absensi</p>
+            </div>
+          </template>
         </div>
       </div>
     </template>

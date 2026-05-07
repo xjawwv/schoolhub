@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 const getToken = () => {
-  if (process.client) return localStorage.getItem('schoolhub_token')
-  return null
+  const tokenCookie = useCookie('schoolhub_token')
+  return tokenCookie.value || null
 }
 
 const createApiInstance = () => {
