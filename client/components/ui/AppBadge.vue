@@ -15,5 +15,6 @@ const variantClass = computed(() => ({
   'badge-danger': props.variant === 'danger',
   'badge-info': props.variant === 'info',
   'badge-gray': props.variant === 'gray',
+  'badge-brand': props.variant === 'brand',
 }))
 </script>

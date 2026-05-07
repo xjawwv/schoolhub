@@ -4,31 +4,31 @@
       <div v-if="!teacher">
         <label class="label">Username</label>
         <input v-model="form.username" type="text" class="input" :class="{ 'input-error': errors.username }" placeholder="username" />
-        <p v-if="errors.username" class="text-xs text-red-500 mt-1">{{ errors.username }}</p>
+        <p v-if="errors.username" class="text-xs text-red-500 mt-1.5 font-medium">{{ errors.username }}</p>
       </div>
 
       <div v-if="!teacher">
         <label class="label">Email</label>
         <input v-model="form.email" type="email" class="input" :class="{ 'input-error': errors.email }" placeholder="email@sekolah.id" />
-        <p v-if="errors.email" class="text-xs text-red-500 mt-1">{{ errors.email }}</p>
+        <p v-if="errors.email" class="text-xs text-red-500 mt-1.5 font-medium">{{ errors.email }}</p>
       </div>
 
       <div v-if="!teacher">
         <label class="label">Password</label>
         <input v-model="form.password" type="password" class="input" :class="{ 'input-error': errors.password }" placeholder="Minimal 6 karakter" />
-        <p v-if="errors.password" class="text-xs text-red-500 mt-1">{{ errors.password }}</p>
+        <p v-if="errors.password" class="text-xs text-red-500 mt-1.5 font-medium">{{ errors.password }}</p>
       </div>
 
       <div>
         <label class="label">NIP</label>
         <input v-model="form.nip" type="text" class="input" :class="{ 'input-error': errors.nip }" placeholder="Nomor Induk Pegawai" :disabled="!!teacher" />
-        <p v-if="errors.nip" class="text-xs text-red-500 mt-1">{{ errors.nip }}</p>
+        <p v-if="errors.nip" class="text-xs text-red-500 mt-1.5 font-medium">{{ errors.nip }}</p>
       </div>
 
       <div class="sm:col-span-2">
         <label class="label">Nama Lengkap</label>
         <input v-model="form.full_name" type="text" class="input" :class="{ 'input-error': errors.full_name }" placeholder="Nama lengkap guru" />
-        <p v-if="errors.full_name" class="text-xs text-red-500 mt-1">{{ errors.full_name }}</p>
+        <p v-if="errors.full_name" class="text-xs text-red-500 mt-1.5 font-medium">{{ errors.full_name }}</p>
       </div>
 
       <div>

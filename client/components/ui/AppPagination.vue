@@ -1,23 +1,26 @@
 <template>
-  <div v-if="meta && meta.totalPages > 1" class="flex items-center justify-between mt-4">
+  <div v-if="meta && meta.totalPages > 1" class="flex flex-col sm:flex-row items-center justify-between mt-5 gap-3">
     <p class="text-sm text-gray-500">
-      Menampilkan {{ startItem }}-{{ endItem }} dari {{ meta.total }} data
+      Menampilkan <span class="font-semibold text-gray-700">{{ startItem }}-{{ endItem }}</span> dari <span class="font-semibold text-gray-700">{{ meta.total }}</span> data
     </p>
     <div class="flex items-center gap-1">
       <button
-        class="btn-outline px-3 py-1.5 text-xs"
+        class="btn-outline btn-sm"
         :disabled="!meta.hasPrevPage"
         @click="$emit('page-change', meta.page - 1)"
       >
-        Sebelumnya
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+        <span class="hidden sm:inline">Sebelumnya</span>
       </button>
 
       <template v-for="page in visiblePages" :key="page">
-        <span v-if="page === '...'" class="px-2 text-gray-400">...</span>
+        <span v-if="page === '...'" class="px-2 text-gray-400 text-sm">...</span>
         <button
           v-else
-          class="w-8 h-8 rounded-lg text-xs font-medium transition-colors"
-          :class="page === meta.page ? 'bg-brand-600 text-white' : 'text-gray-600 hover:bg-gray-100'"
+          class="w-8 h-8 rounded-lg text-xs font-semibold transition-all duration-200"
+          :class="page === meta.page ? 'bg-brand-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'"
           @click="$emit('page-change', page)"
         >
           {{ page }}
@@ -25,11 +28,14 @@
       </template>
 
       <button
-        class="btn-outline px-3 py-1.5 text-xs"
+        class="btn-outline btn-sm"
         :disabled="!meta.hasNextPage"
         @click="$emit('page-change', meta.page + 1)"
       >
-        Berikutnya
+        <span class="hidden sm:inline">Berikutnya</span>
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        </svg>
       </button>
     </div>
   </div>

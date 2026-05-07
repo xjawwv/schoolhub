@@ -3,26 +3,28 @@
     <Transition name="modal">
       <div
         v-if="modelValue"
-        class="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/50"
+        class="fixed inset-0 z-40 flex items-center justify-center p-4 bg-gray-900/30 backdrop-blur-sm"
         @click.self="$emit('update:modelValue', false)"
       >
         <div
-          class="bg-white rounded-2xl shadow-xl w-full animate-fade-in overflow-hidden"
+          class="bg-white rounded-2xl shadow-xl w-full animate-scale-in overflow-hidden"
           :class="sizeClass"
         >
-          <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>
+          <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+            <h3 class="text-lg font-bold text-gray-900">{{ title }}</h3>
             <button
-              class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              class="btn-icon !w-8 !h-8"
               @click="$emit('update:modelValue', false)"
             >
-              ✕
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
-          <div class="px-6 py-4 max-h-[70vh] overflow-y-auto scrollbar-thin">
+          <div class="px-6 py-5 max-h-[70vh] overflow-y-auto scrollbar-thin">
             <slot />
           </div>
-          <div v-if="$slots.footer" class="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end">
+          <div v-if="$slots.footer" class="px-6 py-4 border-t border-gray-100 bg-gray-50/30 flex gap-3 justify-end">
             <slot name="footer" />
           </div>
         </div>
