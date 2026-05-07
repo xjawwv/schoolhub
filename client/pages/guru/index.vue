@@ -8,7 +8,7 @@
     <AppLoader v-if="loading" />
 
     <template v-else-if="stats">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <StatCard
           :icon="svgSchedule"
           label="Jadwal Mengajar"
@@ -21,17 +21,10 @@
           :value="stats.totalSubjects"
           iconBg="bg-emerald-50 text-emerald-600"
         />
-        <StatCard
-          :icon="svgAttendance"
-          label="Absensi Dibuat"
-          :value="stats.recentAttendance.length"
-          sub="5 terbaru"
-          iconBg="bg-violet-50 text-violet-600"
-        />
       </div>
 
       <div class="card">
-        <h3 class="font-bold text-gray-900 mb-5">Absensi Terbaru</h3>
+        <h3 class="font-bold text-gray-900 mb-5">Absensi Terbaru Kelas</h3>
         <div v-if="stats.recentAttendance.length" class="space-y-2">
           <div
             v-for="att in stats.recentAttendance"
@@ -42,10 +35,10 @@
               <p class="text-sm font-semibold text-gray-900">{{ att.class?.name }}</p>
               <p class="text-xs text-gray-400 mt-0.5">{{ formatDate(att.date) }}</p>
             </div>
-            <AppBadge variant="info">{{ att._count?.details }} siswa</AppBadge>
+            <AppBadge variant="info">{{ att._count?.details }} siswa check-in</AppBadge>
           </div>
         </div>
-        <AppEmpty v-else icon="attendance" title="Belum ada absensi" description="Mulai input absensi hari ini" />
+        <AppEmpty v-else icon="attendance" title="Belum ada data absensi" description="Data absensi akan muncul setelah siswa melakukan check-in" />
       </div>
     </template>
   </div>

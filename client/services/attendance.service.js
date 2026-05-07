@@ -4,7 +4,9 @@ export const attendanceService = {
   getAll: (params) => useApi().get('/attendance', { params }),
   getById: (id) => useApi().get(`/attendance/${id}`),
   getMy: (params) => useApi().get('/attendance/my', { params }),
+  getMySummary: () => useApi().get('/attendance/my-summary'),
+  getToday: () => useApi().get('/attendance/today'),
+  checkIn: (data) => useApi().post('/attendance/check-in', data),
   getSummary: (params) => useApi().get('/attendance/summary', { params }),
-  create: (data) => useApi().post('/attendance', data),
-  update: (id, data) => useApi().put(`/attendance/${id}`, data),
+  adminUpdate: (id, data) => useApi().put(`/attendance/${id}`, data),
 }

@@ -22,7 +22,6 @@ const getAll = async (query) => {
       orderBy: { date: 'desc' },
       include: {
         class: { select: { id: true, name: true, grade: true } },
-        teacher: { select: { id: true, full_name: true } },
         _count: { select: { details: true } },
       },
     }),
@@ -36,11 +35,11 @@ const getById = async (id) => {
     where: { id: parseInt(id) },
     include: {
       class: { select: { id: true, name: true } },
-      teacher: { select: { id: true, full_name: true } },
       details: {
         include: {
-          student: { select: { id: true, nis: true, full_name: true, photo: true } },
+          student: { select: { id: true, nis: true, full_name: true, photo: true, gender: true } },
         },
+        orderBy: { student: { full_name: 'asc' } },
       },
     },
   })
@@ -49,83 +48,85 @@ const getById = async (id) => {
   return attendance
 }
 
-const create = async (data, userId) => {
-  const teacher = await prisma.teachers.findUnique({ where: { user_id: userId } })
-  if (!teacher) throw { statusCode: 403, message: 'Hanya guru yang dapat membuat absensi' }
+const checkIn = async (userId, data) => {
+  const student = await prisma.students.findUnique({ where: { user_id: userId } })
+  if (!student) throw { statusCode: 404, message: 'Data siswa tidak ditemukan' }
+  if (!student.class_id) throw { statusCode: 400, message: 'Siswa belum terdaftar di kelas manapun' }
 
-  const existing = await prisma.attendance.findUnique({
-    where: { class_id_date: { class_id: parseInt(data.class_id), date: new Date(data.date) } },
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  let attendance = await prisma.attendance.findUnique({
+    where: { class_id_date: { class_id: student.class_id, date: today } },
   })
 
-  if (existing) throw { statusCode: 409, message: 'Absensi untuk kelas dan tanggal ini sudah ada' }
-
-  const attendance = await prisma.$transaction(async (tx) => {
-    const att = await tx.attendance.create({
-      data: {
-        class_id: parseInt(data.class_id),
-        teacher_id: teacher.id,
-        date: new Date(data.date),
-      },
+  if (!attendance) {
+    attendance = await prisma.attendance.create({
+      data: { class_id: student.class_id, date: today },
     })
-
-    if (data.details && data.details.length > 0) {
-      await tx.attendance_details.createMany({
-        data: data.details.map((d) => ({
-          attendance_id: att.id,
-          student_id: parseInt(d.student_id),
-          status: d.status,
-          notes: d.notes || null,
-        })),
-      })
-    }
-
-    return tx.attendance.findUnique({
-      where: { id: att.id },
-      include: {
-        details: {
-          include: { student: { select: { id: true, nis: true, full_name: true } } },
-        },
-      },
-    })
-  })
-
-  return attendance
-}
-
-const update = async (id, data) => {
-  const existing = await prisma.attendance.findUnique({ where: { id: parseInt(id) } })
-  if (!existing) throw { statusCode: 404, message: 'Data absensi tidak ditemukan' }
-
-  if (data.details && data.details.length > 0) {
-    await prisma.$transaction(
-      data.details.map((d) =>
-        prisma.attendance_details.upsert({
-          where: {
-            attendance_id_student_id: {
-              attendance_id: parseInt(id),
-              student_id: parseInt(d.student_id),
-            },
-          },
-          update: { status: d.status, notes: d.notes || null },
-          create: {
-            attendance_id: parseInt(id),
-            student_id: parseInt(d.student_id),
-            status: d.status,
-            notes: d.notes || null,
-          },
-        })
-      )
-    )
   }
 
-  return prisma.attendance.findUnique({
-    where: { id: parseInt(id) },
-    include: {
-      details: {
-        include: { student: { select: { id: true, nis: true, full_name: true } } },
+  const existing = await prisma.attendance_details.findUnique({
+    where: {
+      attendance_id_student_id: {
+        attendance_id: attendance.id,
+        student_id: student.id,
       },
     },
   })
+
+  if (existing) throw { statusCode: 409, message: 'Anda sudah melakukan absensi hari ini' }
+
+  const detail = await prisma.attendance_details.create({
+    data: {
+      attendance_id: attendance.id,
+      student_id: student.id,
+      status: data.status || 'HADIR',
+      notes: data.notes || null,
+      check_in_time: new Date(),
+    },
+    include: {
+      attendance: {
+        include: { class: { select: { id: true, name: true } } },
+      },
+    },
+  })
+
+  return detail
+}
+
+const getTodayStatus = async (userId) => {
+  const student = await prisma.students.findUnique({ where: { user_id: userId } })
+  if (!student) throw { statusCode: 404, message: 'Data siswa tidak ditemukan' }
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  if (!student.class_id) {
+    return { hasCheckedIn: false, detail: null }
+  }
+
+  const attendance = await prisma.attendance.findUnique({
+    where: { class_id_date: { class_id: student.class_id, date: today } },
+  })
+
+  if (!attendance) return { hasCheckedIn: false, detail: null }
+
+  const detail = await prisma.attendance_details.findUnique({
+    where: {
+      attendance_id_student_id: {
+        attendance_id: attendance.id,
+        student_id: student.id,
+      },
+    },
+    include: {
+      attendance: {
+        include: { class: { select: { id: true, name: true } } },
+      },
+    },
+  })
+
+  return { hasCheckedIn: !!detail, detail }
 }
 
 const getStudentAttendance = async (userId, query) => {
@@ -154,6 +155,22 @@ const getStudentAttendance = async (userId, query) => {
   return { details, meta: buildMeta(total, page, limit) }
 }
 
+const getStudentSummary = async (userId) => {
+  const student = await prisma.students.findUnique({ where: { user_id: userId } })
+  if (!student) throw { statusCode: 404, message: 'Data siswa tidak ditemukan' }
+
+  const summary = await prisma.attendance_details.groupBy({
+    by: ['status'],
+    where: { student_id: student.id },
+    _count: { status: true },
+  })
+
+  const result = { HADIR: 0, SAKIT: 0, IZIN: 0, ALPHA: 0 }
+  summary.forEach((s) => { result[s.status] = s._count.status })
+
+  return result
+}
+
 const getSummary = async (classId, query) => {
   const where = classId ? { class_id: parseInt(classId) } : {}
   if (query.start_date && query.end_date) {
@@ -165,6 +182,7 @@ const getSummary = async (classId, query) => {
 
   const attendance = await prisma.attendance.findMany({
     where,
+    orderBy: { date: 'desc' },
     include: {
       details: true,
       class: { select: { id: true, name: true } },
@@ -174,4 +192,51 @@ const getSummary = async (classId, query) => {
   return attendance
 }
 
-module.exports = { getAll, getById, create, update, getStudentAttendance, getSummary }
+const adminUpdate = async (id, data) => {
+  const existing = await prisma.attendance.findUnique({ where: { id: parseInt(id) } })
+  if (!existing) throw { statusCode: 404, message: 'Data absensi tidak ditemukan' }
+
+  if (data.details && data.details.length > 0) {
+    await prisma.$transaction(
+      data.details.map((d) =>
+        prisma.attendance_details.upsert({
+          where: {
+            attendance_id_student_id: {
+              attendance_id: parseInt(id),
+              student_id: parseInt(d.student_id),
+            },
+          },
+          update: { status: d.status, notes: d.notes || null },
+          create: {
+            attendance_id: parseInt(id),
+            student_id: parseInt(d.student_id),
+            status: d.status,
+            notes: d.notes || null,
+          },
+        })
+      )
+    )
+  }
+
+  return prisma.attendance.findUnique({
+    where: { id: parseInt(id) },
+    include: {
+      class: { select: { id: true, name: true } },
+      details: {
+        include: { student: { select: { id: true, nis: true, full_name: true } } },
+        orderBy: { student: { full_name: 'asc' } },
+      },
+    },
+  })
+}
+
+module.exports = {
+  getAll,
+  getById,
+  checkIn,
+  getTodayStatus,
+  getStudentAttendance,
+  getStudentSummary,
+  getSummary,
+  adminUpdate,
+}

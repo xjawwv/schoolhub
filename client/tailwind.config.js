@@ -1,3 +1,4 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     './components/**/*.{js,vue,ts}',
@@ -60,14 +61,40 @@ module.exports = {
         'sidebar': '2px 0 20px rgba(0, 0, 0, 0.05)',
         'navbar': '0 1px 3px rgba(0, 0, 0, 0.05)',
         'dropdown': '0 10px 40px -10px rgba(0, 0, 0, 0.12)',
+        'apple': '0 4px 24px -4px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.06)',
+        'apple-lg': '0 20px 60px -12px rgba(0, 0, 0, 0.15), 0 4px 16px -4px rgba(0, 0, 0, 0.08)',
+      },
+      transitionTimingFunction: {
+        'apple': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        'apple-spring': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'apple-ease': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'apple-in': 'cubic-bezier(0.55, 0, 1, 0.45)',
+        'apple-out': 'cubic-bezier(0, 0.55, 0.45, 1)',
+        'apple-bounce': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+      },
+      transitionDuration: {
+        '250': '250ms',
+        '350': '350ms',
+        '400': '400ms',
+        '450': '450ms',
       },
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-out',
-        'slide-in': 'slideIn 0.3s ease-out',
-        'slide-up': 'slideUp 0.4s ease-out',
-        'scale-in': 'scaleIn 0.2s ease-out',
+        'fade-in': 'fadeIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
+        'fade-in-fast': 'fadeIn 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
+        'slide-in': 'slideIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
+        'slide-up': 'slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
+        'slide-down': 'slideDown 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
+        'scale-in': 'scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+        'scale-in-fast': 'scaleIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+        'spring-in': 'springIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both',
         'float': 'float 3s ease-in-out infinite',
         'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
+        'shimmer': 'shimmer 1.8s ease-in-out infinite',
+        'page-enter': 'pageEnter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
+        'stagger-1': 'slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.05s both',
+        'stagger-2': 'slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s both',
+        'stagger-3': 'slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s both',
+        'stagger-4': 'slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both',
       },
       keyframes: {
         fadeIn: {
@@ -75,16 +102,28 @@ module.exports = {
           '100%': { opacity: '1' },
         },
         slideIn: {
-          '0%': { transform: 'translateX(-10px)', opacity: '0' },
+          '0%': { transform: 'translateX(-12px)', opacity: '0' },
           '100%': { transform: 'translateX(0)', opacity: '1' },
         },
         slideUp: {
-          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '0%': { transform: 'translateY(12px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideDown: {
+          '0%': { transform: 'translateY(-8px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
         scaleIn: {
-          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '0%': { transform: 'scale(0.92)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        springIn: {
+          '0%': { transform: 'scale(0.85) translateY(8px)', opacity: '0' },
+          '100%': { transform: 'scale(1) translateY(0)', opacity: '1' },
+        },
+        pageEnter: {
+          '0%': { transform: 'translateY(6px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
         },
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
@@ -93,6 +132,10 @@ module.exports = {
         pulseSoft: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.7' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
         },
       },
     },

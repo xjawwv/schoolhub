@@ -1,14 +1,19 @@
 <template>
   <div>
-    <div class="page-header flex items-center justify-between">
-      <div>
-        <h1 class="page-title">Input Absensi</h1>
-        <p class="page-subtitle">Catat kehadiran siswa</p>
-      </div>
-      <button class="btn-primary" @click="openCreate">+ Input Absensi</button>
+    <div class="page-header">
+      <h1 class="page-title">Monitoring Absensi</h1>
+      <p class="page-subtitle">Pantau kehadiran siswa di kelas Anda</p>
     </div>
 
     <div class="card">
+      <div class="filter-bar">
+        <select v-model="filterClass" class="input max-w-xs" @change="applyFilter">
+          <option value="">Semua Kelas</option>
+          <option v-for="cls in classes" :key="cls.id" :value="cls.id">{{ cls.name }}</option>
+        </select>
+        <input v-model="filterDate" type="date" class="input max-w-xs" @change="applyFilter" />
+      </div>
+
       <AppLoader v-if="loading" />
       <template v-else>
         <div v-if="attendance.length" class="table-container">
@@ -17,7 +22,7 @@
               <tr>
                 <th>Tanggal</th>
                 <th>Kelas</th>
-                <th>Jumlah Siswa</th>
+                <th>Siswa Absen</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -25,83 +30,27 @@
               <tr v-for="att in attendance" :key="att.id">
                 <td class="font-medium">{{ formatDate(att.date) }}</td>
                 <td><AppBadge variant="info">{{ att.class?.name }}</AppBadge></td>
-                <td>{{ att._count?.details || 0 }} siswa</td>
                 <td>
-                  <NuxtLink :to="`/guru/absensi/${att.id}`" class="text-brand-600 hover:text-brand-800 text-sm font-medium">
-                    Lihat / Edit
+                  <span class="font-semibold text-gray-900">{{ att._count?.details || 0 }}</span>
+                  <span class="text-gray-400 text-xs ml-1">siswa</span>
+                </td>
+                <td>
+                  <NuxtLink :to="`/guru/absensi/${att.id}`" class="action-view">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                    Lihat Detail
                   </NuxtLink>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <AppEmpty v-else icon="✅" title="Belum ada absensi" description="Mulai input absensi hari ini" />
+        <AppEmpty v-else icon="attendance" title="Belum ada data absensi" description="Data absensi akan muncul setelah siswa melakukan check-in" />
         <AppPagination :meta="meta" @page-change="setPage" />
       </template>
     </div>
-
-    <AppModal v-model="modalOpen" title="Input Absensi Baru" size="xl">
-      <div class="space-y-4">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="label">Kelas</label>
-            <select v-model="form.class_id" class="input" @change="loadStudents">
-              <option value="">Pilih kelas</option>
-              <option v-for="cls in classes" :key="cls.id" :value="cls.id">{{ cls.name }}</option>
-            </select>
-          </div>
-          <div>
-            <label class="label">Tanggal</label>
-            <input v-model="form.date" type="date" class="input" />
-          </div>
-        </div>
-
-        <div v-if="students.length" class="mt-4">
-          <div class="flex items-center justify-between mb-3">
-            <h4 class="font-medium text-gray-900">Daftar Siswa ({{ students.length }})</h4>
-            <div class="flex gap-2">
-              <button type="button" class="text-xs text-emerald-600 hover:underline" @click="setAllStatus('HADIR')">Semua Hadir</button>
-            </div>
-          </div>
-          <div class="space-y-2 max-h-64 overflow-y-auto scrollbar-thin">
-            <div
-              v-for="student in students"
-              :key="student.id"
-              class="flex items-center gap-3 p-3 rounded-lg border border-gray-100"
-            >
-              <div class="w-7 h-7 flex-shrink-0">
-                <UserAvatar :photo="student.photo" :gender="student.gender" :name="student.full_name" size="xs" />
-              </div>
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-900">{{ student.full_name }}</p>
-                <p class="text-xs text-gray-400">{{ student.nis }}</p>
-              </div>
-              <select
-                v-model="form.details.find(d => d.student_id === student.id).status"
-                class="input w-28 text-xs py-1.5"
-              >
-                <option value="HADIR">Hadir</option>
-                <option value="SAKIT">Sakit</option>
-                <option value="IZIN">Izin</option>
-                <option value="ALPHA">Alpha</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div v-else-if="form.class_id" class="py-6 text-center text-sm text-gray-400">
-          Memuat data siswa...
-        </div>
-      </div>
-
-      <template #footer>
-        <button class="btn-outline" @click="modalOpen = false">Batal</button>
-        <button class="btn-primary" :disabled="formLoading || !form.class_id || !form.date" @click="handleSubmit">
-          <span v-if="formLoading" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          Simpan Absensi
-        </button>
-      </template>
-    </AppModal>
   </div>
 </template>
 
@@ -110,20 +59,15 @@ definePageMeta({ layout: 'dashboard', middleware: 'guru' })
 
 import { attendanceService } from '~/services/attendance.service'
 import { classesService } from '~/services/classes.service'
-import { studentsService } from '~/services/students.service'
 
 const toast = useToast()
-
 const attendance = ref([])
 const classes = ref([])
-const students = ref([])
 const meta = ref(null)
 const loading = ref(true)
-const formLoading = ref(false)
-const modalOpen = ref(false)
+const filterClass = ref('')
+const filterDate = ref('')
 const currentPage = ref(1)
-
-const form = reactive({ class_id: '', date: new Date().toISOString().split('T')[0], details: [] })
 
 const formatDate = (date) =>
   new Date(date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
@@ -131,7 +75,10 @@ const formatDate = (date) =>
 const fetchAttendance = async () => {
   loading.value = true
   try {
-    const response = await attendanceService.getAll({ page: currentPage.value, limit: 10 })
+    const params = { page: currentPage.value, limit: 10 }
+    if (filterClass.value) params.class_id = filterClass.value
+    if (filterDate.value) params.date = filterDate.value
+    const response = await attendanceService.getAll(params)
     attendance.value = response.data
     meta.value = response.meta
   } catch {
@@ -148,42 +95,8 @@ const fetchClasses = async () => {
   } catch {}
 }
 
-const loadStudents = async () => {
-  if (!form.class_id) return
-  try {
-    const response = await studentsService.getAll({ class_id: form.class_id, limit: 100 })
-    students.value = response.data
-    form.details = response.data.map((s) => ({ student_id: s.id, status: 'HADIR', notes: '' }))
-  } catch {
-    toast.error('Gagal memuat data siswa')
-  }
-}
-
-const setAllStatus = (status) => {
-  form.details.forEach((d) => (d.status = status))
-}
-
+const applyFilter = () => { currentPage.value = 1; fetchAttendance() }
 const setPage = (page) => { currentPage.value = page; fetchAttendance() }
-
-const openCreate = () => {
-  students.value = []
-  Object.assign(form, { class_id: '', date: new Date().toISOString().split('T')[0], details: [] })
-  modalOpen.value = true
-}
-
-const handleSubmit = async () => {
-  formLoading.value = true
-  try {
-    await attendanceService.create(form)
-    toast.success('Absensi berhasil disimpan')
-    modalOpen.value = false
-    fetchAttendance()
-  } catch (error) {
-    toast.error(error.response?.data?.message || 'Gagal menyimpan absensi')
-  } finally {
-    formLoading.value = false
-  }
-}
 
 onMounted(() => { fetchAttendance(); fetchClasses() })
 </script>

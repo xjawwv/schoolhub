@@ -45,11 +45,11 @@
           </span>
         </button>
 
-        <Transition name="fade">
+        <Transition name="dropdown">
           <div
             v-if="notifOpen"
             v-click-outside="() => (notifOpen = false)"
-            class="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-dropdown border border-gray-100 overflow-hidden z-50"
+            class="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-apple-lg border border-gray-100 overflow-hidden z-50"
           >
             <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
               <span class="font-semibold text-sm text-gray-900">Notifikasi</span>

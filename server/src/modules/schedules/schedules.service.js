@@ -129,4 +129,17 @@ const getStudentSchedule = async (userId) => {
   return schedules
 }
 
-module.exports = { getAll, getById, create, update, remove, getMySchedule, getStudentSchedule }
+const getByClass = async (classId) => {
+  const schedules = await prisma.schedules.findMany({
+    where: { class_id: parseInt(classId) },
+    orderBy: [{ day: 'asc' }, { start_time: 'asc' }],
+    include: {
+      subject: { select: { id: true, name: true, code: true } },
+      teacher: { select: { id: true, full_name: true } },
+      class: { select: { id: true, name: true, grade: true } },
+    },
+  })
+  return schedules
+}
+
+module.exports = { getAll, getById, create, update, remove, getMySchedule, getStudentSchedule, getByClass }

@@ -121,7 +121,7 @@ const guruNav = [
   {
     label: 'Akademik',
     items: [
-      { path: '/guru/absensi', icon: iconAttendance, label: 'Input Absensi' },
+      { path: '/guru/absensi', icon: iconAttendance, label: 'Monitoring Absensi' },
       { path: '/guru/nilai', icon: iconGrades, label: 'Input Nilai' },
       { path: '/guru/siswa', icon: iconStudents, label: 'Data Siswa' },
     ],

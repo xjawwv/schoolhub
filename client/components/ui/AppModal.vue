@@ -7,7 +7,7 @@
         @click.self="$emit('update:modelValue', false)"
       >
         <div
-          class="bg-white rounded-2xl shadow-xl w-full animate-scale-in overflow-hidden"
+          class="modal-panel bg-white rounded-2xl shadow-apple-lg w-full overflow-hidden"
           :class="sizeClass"
         >
           <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">

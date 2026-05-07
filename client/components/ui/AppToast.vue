@@ -42,16 +42,26 @@ const toastIcon = (type) => {
 </script>
 
 <style scoped>
-.toast-enter-active,
+.toast-enter-active {
+  animation: toastSlideIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
 .toast-leave-active {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: toastSlideOut 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  position: absolute;
+  right: 0;
+  width: 100%;
 }
-.toast-enter-from {
-  opacity: 0;
-  transform: translateX(100%) scale(0.9);
+.toast-move {
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-.toast-leave-to {
-  opacity: 0;
-  transform: translateX(100%) scale(0.9);
+
+@keyframes toastSlideIn {
+  0%   { transform: translateX(110%) scale(0.88); opacity: 0; }
+  60%  { transform: translateX(-4%) scale(1.02);  opacity: 1; }
+  100% { transform: translateX(0) scale(1);        opacity: 1; }
+}
+@keyframes toastSlideOut {
+  0%   { transform: translateX(0) scale(1);        opacity: 1; }
+  100% { transform: translateX(110%) scale(0.9);   opacity: 0; }
 }
 </style>

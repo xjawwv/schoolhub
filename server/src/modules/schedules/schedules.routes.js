@@ -7,6 +7,7 @@ router.use(authenticate)
 
 router.get('/my', authorize('GURU'), schedulesController.getMySchedule)
 router.get('/student', authorize('SISWA'), schedulesController.getStudentSchedule)
+router.get('/class/:classId', authorize('ADMIN', 'GURU'), schedulesController.getByClass)
 router.get('/', authorize('ADMIN', 'GURU'), schedulesController.getAll)
 router.get('/:id', authorize('ADMIN', 'GURU'), schedulesController.getById)
 router.post('/', authorize('ADMIN'), schedulesController.create)

@@ -73,7 +73,6 @@ model teachers {
   user       users       @relation(fields: [user_id], references: [id], onDelete: Cascade)
   subjects   subjects[]
   schedules  schedules[]
-  attendance attendance[]
 }
 
 model classes {
@@ -123,13 +122,11 @@ model schedules {
 model attendance {
   id         Int      @id @default(autoincrement())
   class_id   Int
-  teacher_id Int
   date       DateTime @db.Date
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
   class   classes  @relation(fields: [class_id], references: [id])
-  teacher teachers @relation(fields: [teacher_id], references: [id])
   details attendance_details[]
 
   @@unique([class_id, date])
@@ -141,6 +138,7 @@ model attendance_details {
   student_id    Int
   status        AttendanceStatus @default(HADIR)
   notes         String?          @db.Text
+  check_in_time DateTime?
   created_at    DateTime         @default(now())
   updated_at    DateTime         @updatedAt
 

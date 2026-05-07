@@ -5,7 +5,7 @@
         v-if="confirmState.open"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/30 backdrop-blur-sm"
       >
-        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 animate-scale-in">
+        <div class="modal-panel bg-white rounded-2xl shadow-apple-lg max-w-md w-full p-6">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

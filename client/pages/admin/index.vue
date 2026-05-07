@@ -13,26 +13,30 @@
     <AppLoader v-if="loading" />
 
     <template v-else-if="stats">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
         <StatCard
+          class="animate-slide-up"
           :icon="svgStudents"
           label="Total Siswa"
           :value="stats.totalStudents"
           iconBg="bg-blue-50 text-blue-600"
         />
         <StatCard
+          class="animate-slide-up"
           :icon="svgTeachers"
           label="Total Guru"
           :value="stats.totalTeachers"
           iconBg="bg-emerald-50 text-emerald-600"
         />
         <StatCard
+          class="animate-slide-up"
           :icon="svgClasses"
           label="Total Kelas"
           :value="stats.totalClasses"
           iconBg="bg-violet-50 text-violet-600"
         />
         <StatCard
+          class="animate-slide-up"
           :icon="svgSubjects"
           label="Mata Pelajaran"
           :value="stats.totalSubjects"

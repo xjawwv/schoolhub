@@ -64,4 +64,13 @@ const getStudentSchedule = async (req, res, next) => {
   }
 }
 
-module.exports = { getAll, getById, create, update, remove, getMySchedule, getStudentSchedule }
+const getByClass = async (req, res, next) => {
+  try {
+    const schedules = await schedulesService.getByClass(req.params.classId)
+    sendSuccess(res, 'Jadwal kelas berhasil diambil', schedules)
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { getAll, getById, create, update, remove, getMySchedule, getStudentSchedule, getByClass }

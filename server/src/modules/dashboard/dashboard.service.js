@@ -35,11 +35,19 @@ const getGuruStats = async (userId) => {
   const teacher = await prisma.teachers.findUnique({ where: { user_id: userId } })
   if (!teacher) throw { statusCode: 404, message: 'Profil guru tidak ditemukan' }
 
+  const teacherClassIds = await prisma.schedules.findMany({
+    where: { teacher_id: teacher.id },
+    select: { class_id: true },
+    distinct: ['class_id'],
+  })
+
+  const classIds = teacherClassIds.map((s) => s.class_id)
+
   const [totalSchedules, totalSubjects, recentAttendance] = await Promise.all([
     prisma.schedules.count({ where: { teacher_id: teacher.id } }),
     prisma.subjects.count({ where: { teacher_id: teacher.id } }),
     prisma.attendance.findMany({
-      where: { teacher_id: teacher.id },
+      where: classIds.length ? { class_id: { in: classIds } } : {},
       orderBy: { date: 'desc' },
       take: 5,
       include: {
